@@ -1,6 +1,7 @@
 # for seojuhee
 
 $ npm install
+
 $ npm start -- --원하는키명=값
 
 # example
