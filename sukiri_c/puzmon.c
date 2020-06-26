@@ -91,38 +91,13 @@ enum { A, B, C, D, E, F, G, H, I, J, K, L, M, N }; // slot
 enum { FIRE, WATER, WIND, EARTH, LIFE, EMPTY }; // attribute
 enum { MONSTER, PLAYER }; // turn
 
-void printWithColor(int color) {
-    switch (color)
-    {
-    case FIRE:
-        printf("\x1b[30m\x1b[41m$\x1b[0m"); // RED
-        break;
-    case WATER:
-        printf("\x1b[30m\x1b[44m~\x1b[0m"); // BLUE
-        break;
-    case WIND:
-        printf("\x1b[30m\x1b[42m@\x1b[0m"); // GREEN
-        break;
-    case EARTH:
-        printf("\x1b[30m\x1b[43m#\x1b[0m"); // YELLOW
-        break;
-    case LIFE:
-        printf("\x1b[30m\x1b[45m&\x1b[0m"); // PUPLE
-        break;
-    default:
-        printf("\x1b[30m\x1b[40m \x1b[0m"); // BLACK
-        break;
-    }
-}
-
-void printSlot(int* slot) {
-    for (int i = 0; i < SLOT_COUNT; i++)
-    {
-        printWithColor(slot[i]);
-        if (i == 13) printf("\n");
-        if (i < 13) printf(" ");
-    }
-}
+void printWithColor(int color);
+void printSlot(int* slot);
+void printParty(Party party);
+int dungeon(Monster* enemies, Party party, int* slot, int* defeat_count);
+void move(int* slot, char from, char to);
+void attack(Monster* monster, Party* party, char turn, int combo);
+int evaluation(int* slot);
 
 int evaluation(int* slot) {
     int target = 0;
@@ -143,89 +118,30 @@ int evaluation(int* slot) {
         }
     }
     printf("target: %d  count: %d  index_from : %d\n", target, count, index_from);
-    return 1;
-}
-
-void move(int* slot, char from, char to) {
-    int index_from = from - 'A';
-    int index_to = to - 'A';
-    int tmp = slot[index_from]; // 이동시킬 녀석을 빼놓는다.
-    int direction = index_to - index_from; // 앞으로 갈지 뒤로 갈지 방향
-
-    if (direction > 0)
+    if (count > 2)
     {
-        for (int i = index_from; i < index_to; i++) slot[i] = slot[i + 1];
+        // attack();
     }
     else
     {
-        for (int i = index_from; i > index_to; i--) slot[i] = slot[i - 1];
-    }
-    slot[index_to] = tmp;
-    printSlot(&slot[0]);
-    evaluation(&slot[0]);
-}
-
-
-void attack(Monster* monster, Party* party, char turn, int combo) {
-    return;
-}
-
-void printParty(Party party) {
-    printf("파티편성----------------\n");
-    for (int i = 0; i < PARTY_COUNT; i++)
-    {
-        printf("%s HP= %d 공격= %d 방어= %d\n", party.monsters[i].name, party.monsters[i].hp, party.monsters[i].attack, party.monsters[i].defence);
-    }
-    printf("--------------------\n");
-}
-
-int dungeon(Monster* enemies, Party party, int* slot, int* defeat_count) {
-    for (int i = 0; i < ENEMY_COUNT; i++)
-    {
-        Monster monster = enemies[i];
-        printf("%s가 나타났다!\n", monster.name);
-        int turn = PLAYER;
-        while (1)
-        {
-            if (turn) // 플레이어 턴
-            {
-                printf("[ %s 의 턴 ]\n", party.player_name);
-                printf("-----------------------------\n\n\n");
-                printf("           %s\n", monster.name);
-                printf("       HP= %d / %d\n\n\n", monster.hp, monster.max_hp);
-                printf(" %s %s %s %s\n", party.monsters[0].name, party.monsters[1].name, party.monsters[2].name, party.monsters[3].name);
-                printf("       HP= %d / %d\n", party.hp, party.max_hp);
-                printf("-----------------------------\n\n");
-                printf("A B C D E F G H I J K L M N\n");
-                printSlot(&slot[0]);
-                printf("-----------------------------\n\n");
-                String command;
-                printf("커맨드를 입력하시오 > ");
-                scanf("%1023s%*[^\n]%*c", command);
-                move(&slot[0], command[0], command[1]);
-                printf("\n");
-                turn = MONSTER;
-            }
-            else // 몬스터의 턴
-            {
-                turn = PLAYER;
-            }
-
-            // monster.hp = 0;
-            if (monster.hp == 0)
-            {
-                (*defeat_count)++;
-                printf("\n");
-                printf("%s에게 승리했다!\n", monster.name);
-                printf("%s는 더 깊이 전진한다.\n", party.player_name);
-                printf("=================================\n\n");
-                break;
-            }
-            if (party.hp == 0) return 0;
-        }
+        // 끝내라
     }
     return 1;
 }
+
+void attack(Monster* monster, Party* party, char turn, int combo) {
+    // 앞으로 땡기고
+    // 뒤에 랜덤으로 채우고
+    // 공격력 계산
+    // 공격하고
+    // 프린트 한다.
+    // free
+    // 다시 평가한다
+    // evaluation(&slot[0]);
+
+    return;
+}
+
 
 int main(int argc, char const *argv[])
 {
@@ -277,4 +193,113 @@ int main(int argc, char const *argv[])
     }
     printf("쓰러트린 몬스터 수 = %d\n", defeat_count);
     return 0;
+}
+
+void move(int* slot, char from, char to) {
+    int index_from = from - 'A';
+    int index_to = to - 'A';
+    int tmp = slot[index_from]; // 이동시킬 녀석을 빼놓는다.
+    int direction = index_to - index_from; // 앞으로 갈지 뒤로 갈지 방향
+
+    if (direction > 0)
+    {
+        for (int i = index_from; i < index_to; i++) slot[i] = slot[i + 1];
+    }
+    else
+    {
+        for (int i = index_from; i > index_to; i--) slot[i] = slot[i - 1];
+    }
+    slot[index_to] = tmp;
+    printSlot(&slot[0]);
+    evaluation(&slot[0]);
+}
+
+int dungeon(Monster* enemies, Party party, int* slot, int* defeat_count) {
+    for (int i = 0; i < ENEMY_COUNT; i++)
+    {
+        Monster monster = enemies[i];
+        printf("%s가 나타났다!\n", monster.name);
+        int turn = PLAYER;
+        while (1)
+        {
+            if (turn) // 플레이어 턴
+            {
+                printf("[ %s 의 턴 ]\n", party.player_name);
+                printf("-----------------------------\n\n\n");
+                printf("           %s\n", monster.name);
+                printf("       HP= %d / %d\n\n\n", monster.hp, monster.max_hp);
+                printf(" %s %s %s %s\n", party.monsters[0].name, party.monsters[1].name, party.monsters[2].name, party.monsters[3].name);
+                printf("       HP= %d / %d\n", party.hp, party.max_hp);
+                printf("-----------------------------\n\n");
+                printf("A B C D E F G H I J K L M N\n");
+                printSlot(&slot[0]);
+                printf("-----------------------------\n\n");
+                String command;
+                printf("커맨드를 입력하시오 > ");
+                scanf("%1023s%*[^\n]%*c", command);
+                move(&slot[0], command[0], command[1]);
+                printf("\n");
+                turn = MONSTER;
+            }
+            else // 몬스터의 턴
+            {
+                turn = PLAYER;
+            }
+
+            // monster.hp = 0;
+            if (monster.hp == 0)
+            {
+                (*defeat_count)++;
+                printf("\n");
+                printf("%s에게 승리했다!\n", monster.name);
+                printf("%s는 더 깊이 전진한다.\n", party.player_name);
+                printf("=================================\n\n");
+                break;
+            }
+            if (party.hp == 0) return 0;
+        }
+    }
+    return 1;
+}
+
+void printParty(Party party) {
+    printf("파티편성----------------\n");
+    for (int i = 0; i < PARTY_COUNT; i++)
+    {
+        printf("%s HP= %d 공격= %d 방어= %d\n", party.monsters[i].name, party.monsters[i].hp, party.monsters[i].attack, party.monsters[i].defence);
+    }
+    printf("--------------------\n");
+}
+
+void printWithColor(int color) {
+    switch (color)
+    {
+    case FIRE:
+        printf("\x1b[30m\x1b[41m$\x1b[0m"); // RED
+        break;
+    case WATER:
+        printf("\x1b[30m\x1b[44m~\x1b[0m"); // BLUE
+        break;
+    case WIND:
+        printf("\x1b[30m\x1b[42m@\x1b[0m"); // GREEN
+        break;
+    case EARTH:
+        printf("\x1b[30m\x1b[43m#\x1b[0m"); // YELLOW
+        break;
+    case LIFE:
+        printf("\x1b[30m\x1b[45m&\x1b[0m"); // PUPLE
+        break;
+    default:
+        printf("\x1b[30m\x1b[40m \x1b[0m"); // BLACK
+        break;
+    }
+}
+
+void printSlot(int* slot) {
+    for (int i = 0; i < SLOT_COUNT; i++)
+    {
+        printWithColor(slot[i]);
+        if (i == 13) printf("\n");
+        if (i < 13) printf(" ");
+    }
 }
