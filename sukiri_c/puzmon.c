@@ -124,7 +124,29 @@ void printSlot(int* slot) {
     }
 }
 
-int move(int* slot, char from, char to) {
+int evaluation(int* slot) {
+    int target = 0;
+    int count = 0;
+    int index_from = 0;
+    for (int i = 0; i < SLOT_COUNT; i++)
+    {
+        if (target == slot[i])
+        {
+            count++;
+        }
+        else
+        {
+            if (count > 2) break;
+            index_from = i;
+            count = 1;
+            target = slot[i];
+        }
+    }
+    printf("target: %d  count: %d  index_from : %d\n", target, count, index_from);
+    return 1;
+}
+
+void move(int* slot, char from, char to) {
     int index_from = from - 'A';
     int index_to = to - 'A';
     int tmp = slot[index_from]; // 이동시킬 녀석을 빼놓는다.
@@ -140,12 +162,9 @@ int move(int* slot, char from, char to) {
     }
     slot[index_to] = tmp;
     printSlot(&slot[0]);
-    return 0;
+    evaluation(&slot[0]);
 }
 
-int evaluation() {
-    return 1;
-}
 
 void attack(Monster* monster, Party* party, char turn, int combo) {
     return;
