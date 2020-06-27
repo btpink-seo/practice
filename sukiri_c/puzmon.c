@@ -111,17 +111,17 @@ int main(int argc, char const *argv[])
     // 초기설정
     // 적 몬스터 정의
     Monster slime = { "\x1b[30m\x1b[44m~슬라임~\x1b[0m", 100, 100, WATER, 10, 5 };
-    Monster goblin = { "\x1b[30m\x1b[43m#고블린#\x1b[0m", 200, 200, EARTH, 20, 15 };
-    Monster oak = { "\x1b[30m\x1b[42m@오크@\x1b[0m", 300, 300, WIND, 30, 25 };
-    Monster werewolf = { "\x1b[30m\x1b[42m@웨어울프@\x1b[0m", 400, 400, WIND, 40, 30 };
-    Monster dragon = { "\x1b[30m\x1b[41m$드래곤$\x1b[0m", 800, 800, FIRE, 50, 40 };
+    Monster goblin = { "\x1b[30m\x1b[43m#고블린#\x1b[0m", 200, 200, EARTH, 20, 10 };
+    Monster oak = { "\x1b[30m\x1b[42m@오크@\x1b[0m", 300, 300, WIND, 30, 15 };
+    Monster werewolf = { "\x1b[30m\x1b[42m@웨어울프@\x1b[0m", 400, 400, WIND, 40, 20 };
+    Monster dragon = { "\x1b[30m\x1b[41m$드래곤$\x1b[0m", 800, 800, FIRE, 50, 25 };
     Monster enemies[ENEMY_COUNT] = { slime, goblin, oak, werewolf, dragon };
 
     // 내 몬스터 정의
-    Monster red = { "\x1b[30m\x1b[41m$주작$\x1b[0m", 150, 150, FIRE, 25, 10 };
-    Monster blue = { "\x1b[30m\x1b[42m@청룡@\x1b[0m", 150, 150, WIND, 15, 10 };
-    Monster white = { "\x1b[30m\x1b[43m#백호#\x1b[0m", 150, 150, EARTH, 20, 5 };
-    Monster black = { "\x1b[30m\x1b[44m~현무~\x1b[0m", 150, 150, WATER, 20, 15 };
+    Monster red = { "\x1b[30m\x1b[41m$주작$\x1b[0m", 150, 150, FIRE, 30, 5 };
+    Monster blue = { "\x1b[30m\x1b[42m@청룡@\x1b[0m", 150, 150, WIND, 30, 5 };
+    Monster white = { "\x1b[30m\x1b[43m#백호#\x1b[0m", 150, 150, EARTH, 35, 5 };
+    Monster black = { "\x1b[30m\x1b[44m~현무~\x1b[0m", 150, 150, WATER, 35, 5 };
     Monster my_monsters[PARTY_COUNT] = { red, blue, white, black };
     int total_hp = 0, total_defence = 0;
     for (int i = 0; i < PARTY_COUNT; i++)
@@ -202,11 +202,8 @@ EvalResult* evaluation(int* slot) {
 }
 
 void playerAttack(Monster* monster, Party* party, int* combo, EvalResult eval_result, int* slot) {
-    // 앞으로 땡기고
-    for (int i = eval_result.index_from; i < SLOT_COUNT - eval_result.count; i++) slot[i] = slot[i + eval_result.count];
-    // 뒤에 랜덤으로 채우고
-    for (int i = SLOT_COUNT - eval_result.count; i < SLOT_COUNT; i++) slot[i] = rand() % 5;
     // 공격력 계산 (공격몬스터의 공격력 - 적의 방어력) * 속성보정 * (1.5^(삭제보석수 - 3 + 콤보수)) +- 10%
+    (*combo)++;
     double random = rand() % 21 + 90; // 90 ~ 110
     if (eval_result.target == LIFE)
     {
@@ -214,12 +211,12 @@ void playerAttack(Monster* monster, Party* party, int* combo, EvalResult eval_re
         int recovery = 20 * pow(1.5, (eval_result.count - 3 + *combo)) * random / 100;
         if (party->hp != party->max_hp)
         {
-            party->hp += recovery;
-            printf("%s는 %d 회복했다!\n\n", party->player_name, recovery);
+            party->hp = party->hp + recovery >= party->max_hp ? party->max_hp : party->hp + recovery;
+            printf("\n%s는 %d 회복했다!\n\n", party->player_name, recovery);
         }
         else
         {
-            printf("최대 HP이기 때문에 회복되지 않았습니다.\n");
+            printf("\n최대 HP이기 때문에 회복되지 않았습니다.\n");
         }
     }
     else
@@ -246,9 +243,13 @@ void playerAttack(Monster* monster, Party* party, int* combo, EvalResult eval_re
         // 프린트 한다.
         String cb;
         *combo > 1 ? sprintf(cb, "\x1b[30m\x1b[45m%dCOMBO\x1b[0m", *combo) : sprintf(cb, "");
-        printf("%s의 공격!\n%s에게 %d의 데미지!\n\n", cb, monster->name, damage);
+        printf("\n%s의 공격! %s\n%s에게 %d의 데미지!\n\n", party->player_name, cb, monster->name, damage);
     }
-    (*combo)++;
+    // 앞으로 땡기고
+    for (int i = eval_result.index_from; i < SLOT_COUNT - eval_result.count; i++) slot[i] = slot[i + eval_result.count];
+    // 뒤에 랜덤으로 채우고
+    for (int i = SLOT_COUNT - eval_result.count; i < SLOT_COUNT; i++) slot[i] = rand() % 5;
+    printSlot(&slot[0]);
 }
 
 double checkAttribute(int my_attribute, int monster_attribute) {
@@ -299,13 +300,13 @@ int dungeon(Monster* enemies, Party party, int* slot, int* defeat_count) {
     for (int i = 0; i < ENEMY_COUNT; i++)
     {
         Monster monster = enemies[i];
-        printf("%s가 나타났다!\n", monster.name);
+        printf("%s가 나타났다!\n\n", monster.name);
         int turn = PLAYER;
         while (1)
         {
             if (turn) // 플레이어 턴
             {
-                printf("[ %s 의 턴 ]\n\n", party.player_name);
+                printf("[ %s 의 턴 ]\n", party.player_name);
                 printf("-----------------------------\n\n\n");
                 printf("           %s\n", monster.name);
                 printf("       HP= %d / %d\n\n\n", monster.hp, monster.max_hp);
@@ -335,18 +336,19 @@ int dungeon(Monster* enemies, Party party, int* slot, int* defeat_count) {
                         break;
                     }
                 }
-
                 printf("\n");
                 turn = MONSTER;
             }
             else // 몬스터의 턴
             {
-                printf("[ %s 의 턴 ]\n\n", monster.name);
+                printf("[ %s 의 턴 ]\n", monster.name);
+                printf("-----------------------------\n\n");
                 double random = rand() % 21 + 90; // 90 ~ 110
                 int damage = (monster.attack - party.defence) * random / 100;
                 if (damage < 0) damage = 1;
                 party.hp -= damage;
                 printf("%s의 공격!\n%d의 데미지를 받았다!\n\n", monster.name, damage);
+                printf("-----------------------------\n\n\n");
                 turn = PLAYER;
             }
 
