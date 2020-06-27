@@ -43,7 +43,7 @@
 //     5-16. 적 턴에서 적은 파티에게 공격을 하고 파티의 hp를 줄인다.
 
 // 6. 데미지 룰
-//     6-1. 배틀에서 데미지 또는 회복량은 다음 공식에 따라 결정된다. 또한 +-X% 로 기재된 경우는 그 값을 표준으로하여 -20%~+20%의 폭에서 랜덤하게 값이 변동하는 것을 의미한다.
+//     6-1. 배틀에서 데미지 또는 회복량은 다음 공식에 따라 결정된다. 또한 +-X% 로 기재된 경우는 그 값을 표준으로하여 -x%~+x%의 폭에서 랜덤하게 값이 변동하는 것을 의미한다.
 //     6-2. 적에 의한 파티의 공격 데미지
 //         (적 공격력 - 파티방어력) +- 10%
 //         단, 위의 값이 음수가 될 경우 공격력은 1로 취급한다.
@@ -86,6 +86,12 @@ typedef struct
     int max_hp;
     int defence;
 } Party;
+typedef struct
+{
+    int target;
+    int count;
+    int index_from;
+} EvalResult;
 
 enum { A, B, C, D, E, F, G, H, I, J, K, L, M, N }; // slot
 enum { FIRE, WATER, WIND, EARTH, LIFE, EMPTY }; // attribute
@@ -96,52 +102,9 @@ void printSlot(int* slot);
 void printParty(Party party);
 int dungeon(Monster* enemies, Party party, int* slot, int* defeat_count);
 void move(int* slot, char from, char to);
-void attack(Monster* monster, Party* party, char turn, int combo);
-int evaluation(int* slot);
-
-int evaluation(int* slot) {
-    int target = 0;
-    int count = 0;
-    int index_from = 0;
-    for (int i = 0; i < SLOT_COUNT; i++)
-    {
-        if (target == slot[i])
-        {
-            count++;
-        }
-        else
-        {
-            if (count > 2) break;
-            index_from = i;
-            count = 1;
-            target = slot[i];
-        }
-    }
-    printf("target: %d  count: %d  index_from : %d\n", target, count, index_from);
-    if (count > 2)
-    {
-        // attack();
-    }
-    else
-    {
-        // 끝내라
-    }
-    return 1;
-}
-
-void attack(Monster* monster, Party* party, char turn, int combo) {
-    // 앞으로 땡기고
-    // 뒤에 랜덤으로 채우고
-    // 공격력 계산
-    // 공격하고
-    // 프린트 한다.
-    // free
-    // 다시 평가한다
-    // evaluation(&slot[0]);
-
-    return;
-}
-
+void playerAttack(Monster* monster, Party* party, int* combo, EvalResult eval_result, int* slot);
+EvalResult* evaluation(int* slot);
+double checkAttribute(int my_attribute, int monster_attribute);
 
 int main(int argc, char const *argv[])
 {
@@ -211,7 +174,125 @@ void move(int* slot, char from, char to) {
     }
     slot[index_to] = tmp;
     printSlot(&slot[0]);
-    evaluation(&slot[0]);
+}
+
+EvalResult* evaluation(int* slot) {
+    int target = 0;
+    int count = 0;
+    int index_from = 0;
+    for (int i = 0; i < SLOT_COUNT; i++)
+    {
+        if (target == slot[i])
+        {
+            count++;
+        }
+        else
+        {
+            if (count > 2) break;
+            index_from = i;
+            count = 1;
+            target = slot[i];
+        }
+    }
+    EvalResult* eval_result = malloc((sizeof(EvalResult)));
+    eval_result->target = target;
+    eval_result->count = count;
+    eval_result->index_from = index_from;
+    return eval_result;
+}
+
+void playerAttack(Monster* monster, Party* party, int* combo, EvalResult eval_result, int* slot) {
+    // 앞으로 땡기고
+    for (int i = eval_result.index_from; i < SLOT_COUNT - eval_result.count; i++) slot[i] = slot[i + eval_result.count];
+    // 뒤에 랜덤으로 채우고
+    for (int i = SLOT_COUNT - eval_result.count; i < SLOT_COUNT; i++) slot[i] = rand() % 5;
+    // 공격력 계산 (공격몬스터의 공격력 - 적의 방어력) * 속성보정 * (1.5^(삭제보석수 - 3 + 콤보수)) +- 10%
+    double random = rand() % 21 + 90; // 90 ~ 110
+    if (eval_result.target == LIFE)
+    {
+        // recovery 20 * (1.5^(삭제보석수 - 3 + 콤보수)) +- 10%
+        int recovery = 20 * pow(1.5, (eval_result.count - 3 + *combo)) * random / 100;
+        if (party->hp != party->max_hp)
+        {
+            party->hp += recovery;
+            printf("%s는 %d 회복했다!\n\n", party->player_name, recovery);
+        }
+        else
+        {
+            printf("최대 HP이기 때문에 회복되지 않았습니다.\n");
+        }
+    }
+    else
+    {
+        // (공격몬스터의 공격력 - 적의 방어력) * 속성보정 * (1.5^(삭제보석수 - 3 + 콤보수)) +- 10%
+        // 몬스터 찾기
+        int my_monster_attack = 0, my_monster_attribute = 0;
+        for (int i = 0; i < PARTY_COUNT; i++)
+        {
+            if (party->monsters[i].attribute == eval_result.target)
+            {
+                my_monster_attack = party->monsters[i].attack;
+                my_monster_attribute = party->monsters[i].attribute;
+                break;
+            }
+        }
+        // 속성 보정치 WATER > FIRE, FIRE > WIND, WIND > EARTH, EARTH > WATER
+        // FIRE = 0, WATER = 1, WIND = 2, EARTH = 3
+        double attribute = checkAttribute(my_monster_attribute, monster->attribute);
+        int damage = (my_monster_attack - monster->defence) * attribute * pow(1.5, (eval_result.count - 3 + *combo)) * random / 100;
+        if (damage < 0) damage = 1;
+        // 공격하고
+        monster->hp -= damage;
+        // 프린트 한다.
+        String cb;
+        *combo > 1 ? sprintf(cb, "\x1b[30m\x1b[45m%dCOMBO\x1b[0m", *combo) : sprintf(cb, "");
+        printf("%s의 공격!\n%s에게 %d의 데미지!\n\n", cb, monster->name, damage);
+    }
+    (*combo)++;
+}
+
+double checkAttribute(int my_attribute, int monster_attribute) {
+    double result = 1.0;
+    switch (my_attribute)
+    {
+    case FIRE:
+        if (monster_attribute == WIND)
+        {
+            result = 2.0;
+        }
+        else if (monster_attribute == WATER)
+        {
+            result = 0.5;
+        }
+    case WATER:
+        if (monster_attribute == FIRE)
+        {
+            result = 2.0;
+        }
+        else if (monster_attribute == EARTH)
+        {
+            result = 0.5;
+        }
+    case WIND:
+        if (monster_attribute == EARTH)
+        {
+            result = 2.0;
+        }
+        else if (monster_attribute == FIRE)
+        {
+            result = 0.5;
+        }
+    case EARTH:
+        if (monster_attribute == WATER)
+        {
+            result = 2.0;
+        }
+        else if (monster_attribute == WIND)
+        {
+            result = 0.5;
+        }
+    }
+    return result;
 }
 
 int dungeon(Monster* enemies, Party party, int* slot, int* defeat_count) {
@@ -224,7 +305,7 @@ int dungeon(Monster* enemies, Party party, int* slot, int* defeat_count) {
         {
             if (turn) // 플레이어 턴
             {
-                printf("[ %s 의 턴 ]\n", party.player_name);
+                printf("[ %s 의 턴 ]\n\n", party.player_name);
                 printf("-----------------------------\n\n\n");
                 printf("           %s\n", monster.name);
                 printf("       HP= %d / %d\n\n\n", monster.hp, monster.max_hp);
@@ -238,16 +319,38 @@ int dungeon(Monster* enemies, Party party, int* slot, int* defeat_count) {
                 printf("커맨드를 입력하시오 > ");
                 scanf("%1023s%*[^\n]%*c", command);
                 move(&slot[0], command[0], command[1]);
+                int combo = 0;
+                // 평가 어택 루프
+                while (1)
+                {
+                    EvalResult* eval_result = evaluation(&slot[0]);
+                    if (eval_result->count > 2)
+                    {
+                        playerAttack(&monster, &party, &combo, *eval_result, &slot[0]);
+                        free(eval_result);
+                    }
+                    else
+                    {
+                        free(eval_result);
+                        break;
+                    }
+                }
+
                 printf("\n");
                 turn = MONSTER;
             }
             else // 몬스터의 턴
             {
+                printf("[ %s 의 턴 ]\n\n", monster.name);
+                double random = rand() % 21 + 90; // 90 ~ 110
+                int damage = (monster.attack - party.defence) * random / 100;
+                if (damage < 0) damage = 1;
+                party.hp -= damage;
+                printf("%s의 공격!\n%d의 데미지를 받았다!\n\n", monster.name, damage);
                 turn = PLAYER;
             }
 
-            // monster.hp = 0;
-            if (monster.hp == 0)
+            if (monster.hp <= 0)
             {
                 (*defeat_count)++;
                 printf("\n");
@@ -256,7 +359,7 @@ int dungeon(Monster* enemies, Party party, int* slot, int* defeat_count) {
                 printf("=================================\n\n");
                 break;
             }
-            if (party.hp == 0) return 0;
+            if (party.hp <= 0) return 0;
         }
     }
     return 1;
