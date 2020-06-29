@@ -99,7 +99,6 @@ enum { MONSTER, PLAYER }; // turn
 
 void printWithColor(int color);
 void printSlot(int* slot);
-void printParty(Party party);
 int dungeon(Monster* enemies, Party party, int* slot, int* defeat_count);
 void move(int* slot, char from, char to);
 void playerAttack(Monster* monster, Party* party, int* combo, EvalResult eval_result, int* slot);
@@ -111,17 +110,17 @@ int main(int argc, char const *argv[])
     // 초기설정
     // 적 몬스터 정의
     Monster slime = { "\x1b[30m\x1b[44m~슬라임~\x1b[0m", 100, 100, WATER, 10, 5 };
-    Monster goblin = { "\x1b[30m\x1b[43m#고블린#\x1b[0m", 200, 200, EARTH, 20, 10 };
-    Monster oak = { "\x1b[30m\x1b[42m@오크@\x1b[0m", 300, 300, WIND, 30, 15 };
+    Monster goblin = { "\x1b[30m\x1b[43m#고블린#\x1b[0m", 200, 200, EARTH, 30, 10 };
+    Monster oak = { "\x1b[30m\x1b[42m@오크@\x1b[0m", 300, 300, WIND, 40, 15 };
     Monster werewolf = { "\x1b[30m\x1b[42m@웨어울프@\x1b[0m", 400, 400, WIND, 40, 20 };
-    Monster dragon = { "\x1b[30m\x1b[41m$드래곤$\x1b[0m", 800, 800, FIRE, 50, 25 };
+    Monster dragon = { "\x1b[30m\x1b[41m$드래곤$\x1b[0m", 800, 800, FIRE, 50, 20 };
     Monster enemies[ENEMY_COUNT] = { slime, goblin, oak, werewolf, dragon };
 
     // 내 몬스터 정의
-    Monster red = { "\x1b[30m\x1b[41m$주작$\x1b[0m", 150, 150, FIRE, 30, 5 };
-    Monster blue = { "\x1b[30m\x1b[42m@청룡@\x1b[0m", 150, 150, WIND, 30, 5 };
+    Monster red = { "\x1b[30m\x1b[41m$주작$\x1b[0m", 150, 150, FIRE, 30, 10 };
+    Monster blue = { "\x1b[30m\x1b[42m@청룡@\x1b[0m", 150, 150, WIND, 30, 10 };
     Monster white = { "\x1b[30m\x1b[43m#백호#\x1b[0m", 150, 150, EARTH, 35, 5 };
-    Monster black = { "\x1b[30m\x1b[44m~현무~\x1b[0m", 150, 150, WATER, 35, 5 };
+    Monster black = { "\x1b[30m\x1b[44m~현무~\x1b[0m", 150, 150, WATER, 35, 15 };
     Monster my_monsters[PARTY_COUNT] = { red, blue, white, black };
     int total_hp = 0, total_defence = 0;
     for (int i = 0; i < PARTY_COUNT; i++)
@@ -130,7 +129,7 @@ int main(int argc, char const *argv[])
         total_defence += my_monsters[i].defence;
     }
     // 파티 정의
-    Party party = { argv[1], my_monsters, total_hp, total_hp, total_defence };
+    Party party = { argv[1], my_monsters, total_hp, total_hp, total_defence / PARTY_COUNT };
 
     // 슬롯 정의
     srand((unsigned)time(0UL));
@@ -142,7 +141,12 @@ int main(int argc, char const *argv[])
     // 게임 시작
     printf("*** Puzzle & Monsters ***\n");
     printf("%s의 파티(HP=%d)는 던전에 도착했다.\n", party.player_name, party.max_hp);
-    printParty(party);
+    printf("파티편성----------------\n");
+    for (int i = 0; i < PARTY_COUNT; i++)
+    {
+        printf("%s HP= %d 공격= %d 방어= %d\n", party.monsters[i].name, party.monsters[i].hp, party.monsters[i].attack, party.monsters[i].defence);
+    }
+    printf("--------------------\n");
     printf("\n");
     int is_clear = dungeon(enemies, party, &slot[0], &defeat_count);
     if (is_clear)
@@ -237,7 +241,7 @@ void playerAttack(Monster* monster, Party* party, int* combo, EvalResult eval_re
         // FIRE = 0, WATER = 1, WIND = 2, EARTH = 3
         double attribute = checkAttribute(my_monster_attribute, monster->attribute);
         int damage = (my_monster_attack - monster->defence) * attribute * pow(1.5, (eval_result.count - 3 + *combo)) * random / 100;
-        if (damage < 0) damage = 1;
+        if (damage <= 0) damage = 1;
         // 공격하고
         monster->hp -= damage;
         // 프린트 한다.
@@ -365,15 +369,6 @@ int dungeon(Monster* enemies, Party party, int* slot, int* defeat_count) {
         }
     }
     return 1;
-}
-
-void printParty(Party party) {
-    printf("파티편성----------------\n");
-    for (int i = 0; i < PARTY_COUNT; i++)
-    {
-        printf("%s HP= %d 공격= %d 방어= %d\n", party.monsters[i].name, party.monsters[i].hp, party.monsters[i].attack, party.monsters[i].defence);
-    }
-    printf("--------------------\n");
 }
 
 void printWithColor(int color) {
