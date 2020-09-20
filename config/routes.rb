@@ -74,5 +74,9 @@ Rails.application.routes.draw do
   get 'record/find_by2'
   get 'record/keyword'
   post 'record/ph1'
+  get 'ctrl/upload'
+  post 'ctrl/upload_process'
+  get 'ctrl/updb(/:id)' => 'ctrl#updb'
+  put 'ctrl/updb_process(/:id)' => 'ctrl#updb_process'
 
 end
