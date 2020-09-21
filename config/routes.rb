@@ -78,5 +78,15 @@ Rails.application.routes.draw do
   post 'ctrl/upload_process'
   get 'ctrl/updb(/:id)' => 'ctrl#updb'
   put 'ctrl/updb_process(/:id)' => 'ctrl#updb_process'
+  get 'ctrl/res_render'
+  get 'ctrl/show_photo'
+  get 'ctrl/get_xml'
+  get 'ctrl/cookie'
+  post 'ctrl/cookie_rec'
+  get 'ctrl/device'
 
+  get 'login' => 'login#index'
+  post 'login/auth'
+  delete 'logout' => 'login#logout'
+  get 'hello/view'
 end

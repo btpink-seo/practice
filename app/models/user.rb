@@ -25,4 +25,6 @@ class User < ApplicationRecord
   with_options on: :hoge do
     validates :email, presence: :true
   end
+
+  has_secure_password
 end

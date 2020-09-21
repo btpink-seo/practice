@@ -30,4 +30,36 @@ class CtrlController < ApplicationController
       render plain: @author.errors.full_messages[0]
     end
   end
+
+  def res_render
+    # action이라 적혀있지만 사실은 템플렛을 불러오는 것이다.
+    # render action: :upload and return
+    # render template: 'hello/index'
+    # render 'hello/index'
+    # render plain: '<div>오늘도 날씨가 좋구나</div>'
+    # render html: '<div>오늘도 날씨가 좋구나</div>'.html_safe
+    # render inline: "request info : #{request.headers}"
+    # head :not_found
+    # redirect_to 'http://www.naver.com'
+    redirect_to books_path
+  end
+
+  def show_photo
+    @author = Author.find(1)
+    send_data @author.photo, type: @author.ctype, disposition: :inline
+  end
+
+  def get_xml
+    @books = Book.all
+    render json: @books
+  end
+
+  def cookie
+    @email = cookies[:email]
+  end
+
+  def cookie_rec
+    cookies[:email] = { value: params[:email], expires: 3.months.from_now, http_only: true }
+    render plain: 'saved cookie'
+  end
 end
