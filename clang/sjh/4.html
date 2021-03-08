@@ -1,0 +1,31 @@
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <img id="image" src="flower.jpg" height="50" width="50"><br>
+    <span id="mySpan">높이: 50픽셀 * 폭: 50픽셀</span><br><br>
+    <input type="button" value="이미지 크기 X 2" onClick="imageSizeX2()">
+    <script>
+        function imageSizeX2() {
+            // (A) 화면에 표시된 이미지를 두 배로 확대하는 부분
+            var img = document.getElementById("image");
+            var hei = img.height;
+            var wid = img.width;
+            img.height = hei * 2;
+            img.width = wid * 2;
+
+
+            // (B) 확대된 이미지의 크기 정보를 <span> 태그 내에 표시하는 부분
+var span = document.getElementById("mySpan");
+span.textContent = "높이: " + (hei * 2) + "픽셀 * 폭: " + (wid * 2) + "픽셀";
+span.style.fontSize = "15pt";
+span.style.fontWeight = "bold";
+span.style.color = "blue";
+span.style.backgroundColor = "yellow";
+        }
+    </script>
+</body>
+</html>
