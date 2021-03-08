@@ -1,7 +1,7 @@
 # practice
 
-## ![GitHub stats](https://github-readme-stats.vercel.app/api?username=btpink-seo)
-## ![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=btpink-seo&langs_count=6&layout=compact)
+## [![GitHub stats](https://github-readme-stats.vercel.app/api?username=btpink-seo)](https://github.com/btpink-seo)
+## [![Top Langs](https://github-readme-stats.vercel.app/api/top-langs/?username=btpink-seo&langs_count=6&layout=compact)](https://github.com/btpink-seo)
 ## repository 합치기
 ```bash
 $ git subtree add --prefix=tensorflow https://github.com/btpink-seo/tensorflow.git master
