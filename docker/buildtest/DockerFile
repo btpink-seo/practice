@@ -1,0 +1,19 @@
+# 1. ubuntu
+FROM ubuntu:16.04
+LABEL maintainer subicura@subicura.com
+RUN apt-get -y update
+
+# 2. ruby
+RUN apt-get -y install ruby
+RUN gem install bundler
+
+# 3. copy source
+COPY . /usr/src/app
+
+# 4. Gem pakage install
+WORKDIR /usr/src/app
+RUN bundle install
+
+# 5. sinatra server start
+EXPOSE 4567
+CMD bundle exec ruby app.rb -o 0.0.0.0
