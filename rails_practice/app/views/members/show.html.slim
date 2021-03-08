@@ -1,0 +1,15 @@
+p#notice = notice
+
+p
+  strong Name:
+  = @member.name
+p
+  strong Email:
+  = @member.email
+p
+  strong Lock version:
+  = @member.lock_version
+
+=> link_to 'Edit', edit_member_path(@member)
+'|
+=< link_to 'Back', members_path

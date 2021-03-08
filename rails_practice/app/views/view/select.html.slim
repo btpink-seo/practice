@@ -1,0 +1,5 @@
+= form_for(@book) do |f|
+  = f.select :publish, ['지은사', '경제지', '기술평론사'], { include_blank: '선택해주세요' }, class: 'pub'
+  = f.select :publish, { '지은사' => 1, '경제지' => 2, '기술평론사' => 3 }
+  = f.select(:publish, [['지은사', 1], ['경제지', 2], ['기술평론사', 3]])
+  = f.select :publish, ['지은사', '경제지', '기술평론사'],  {include_blank: '선택해주세요', multiple: true}

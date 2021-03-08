@@ -1,0 +1,9 @@
+= form_for(@book) do |f|
+  = f.collection_check_boxes(:publish, @books, :publish, :publish)
+  br
+  .field
+    = f.label :publish, 'Label'
+    = f.collection_radio_buttons(:publish, @books, :publish, :publish)
+
+  .actions
+    = f.submit 'save', data: { confirm: '저장하시겠습니까', disable_with: '처리중'}

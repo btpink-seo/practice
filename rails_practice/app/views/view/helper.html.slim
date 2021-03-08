@@ -1,0 +1,8 @@
+- @books = Book.all
+
+= list_tag @books, 'title'
+hr/
+= blockquote_tag('http://www.wings.msn.to', '서버사이드기술의 학습', class: 'quote') do
+  | aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa
+  br
+  = image_tag('http://www.wings.msn.to/image/wings.jpg')

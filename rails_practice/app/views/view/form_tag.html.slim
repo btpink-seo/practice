@@ -1,0 +1,34 @@
+= content_for :extend_menu do
+  = link_to 'aaa', action: :form_tag
+
+= form_tag(action: :create) do
+  .field
+    = label :book, :isbn
+    br
+    = text_field :book, :isbn, size: 25
+  .field
+    = label :book, :title
+    br
+    = text_field :book, :title, size: 25
+  .field
+    = label :book, :title
+    br
+    = text_field :book, :title, size: 25
+  .field
+    = label :book, :price
+    br
+    = number_field :book, :price, size: 25
+  .field
+    = label :book, :publish
+    br
+    = text_field :book, :publish, size: 25
+  .field
+    = label :book, :published
+    br
+    = date_field :book, :published, size: 25
+  .field
+    = label :book, :dl
+    br
+    = check_box :book, :dl, size: 25
+  .actions
+    = submit_tag 'submit'

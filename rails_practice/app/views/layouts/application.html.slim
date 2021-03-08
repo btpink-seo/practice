@@ -1,0 +1,17 @@
+doctype html
+
+html
+  head
+    title
+      | Myapp
+    = csrf_meta_tags
+    = csp_meta_tag
+
+    = stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track': 'reload'
+    = javascript_include_tag 'application', 'data-turbolinks-track': 'reload'
+
+  body
+    .container
+      = link_to 'logout', logout_path, method: :delete
+      br/
+      = content_for?(:content) ? yield(:content) : yield

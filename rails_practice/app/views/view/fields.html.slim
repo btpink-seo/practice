@@ -1,0 +1,19 @@
+= form_for(@user) do |f|
+  .form-group
+    = f.label :username, '유저명 : '
+    = f.text_field :username, class: 'form-control'
+
+  .form-group
+    = f.label :email, '메일주소 : '
+    = f.text_field :email, class: 'form-control'
+
+  = field_set_tag '작가정보', class: 'form-group border p-4' do
+    = fields_for @user.author do |af|
+      .form-group
+        = af.label :name, '작가명 : '
+        = af.text_field :name, class: 'form-control'
+
+      .form-group
+        = af.label :birth, '생일 : '
+        = af.text_field :birth, class: 'form-control'
+  = f.submit

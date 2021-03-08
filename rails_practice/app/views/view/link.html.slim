@@ -1,0 +1,16 @@
+= link_to 'support site', 'http://www.wings.msn.to/'
+= link_to 'top', { controller: :hello, action: :index, id: :aaa, class: :menu }, class: 'aaa'
+= link_to 'delete', book_path(1), { method: :delete, data: { confirm: 'delete?' } }
+- book = Book.find(1)
+= link_to book_path(book) do
+  = image_tag "http://www.wings.msn.to/books/#{book.isbn}/#{book.isbn}.jpg"
+
+hr/
+- @user = User.new
+= link_to_if @user.nil?, 'login', controller: :login, action: :index
+br/
+= link_to_unless @user, 'login', controller: :login, action: :index
+br/
+= link_to_if @user.nil?, 'login', controller: :login, action: :index do |name|
+  = link_to 'my page', controller: :hello, action: :index
+= debug(@user)

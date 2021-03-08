@@ -1,0 +1,106 @@
+= form_for(@book) do |f|
+  .field
+    label
+      | color_field
+    = f.color_field :isbn
+  .field
+    label
+      | date_field
+    = f.date_field :published
+  .field
+    label
+      | time_field
+    = f.time_field :published
+  .field
+    label
+      | datetime_field
+    = f.datetime_field :published
+  .field
+    label
+      | datetime_local_field
+    = f.datetime_local_field :published
+  .field
+    label
+      | month_field
+    = f.month_field :published
+  .field
+    label
+      | week_field
+    = f.week_field :published
+  .field
+    label
+      | email_field
+    = f.email_field :isbn, size: 25, maxlength: 30
+  .field
+    label
+      | number_field
+    = f.number_field :price, min: 10, max: 10_000, step: 10
+  .field
+    label
+      | range_field
+    = f.range_field :price, min: 0, max: 10_000
+  .field
+    label
+      | search_field
+    = f.search_field :isbn, size: 10, maxlength: 15
+  .field
+    label
+      | telephone_field
+    = f.telephone_field :isbn, size: 15, maxlength: 20
+  .field
+    label
+      | url_field
+    = f.url_field :isbn, size: 10, maxlength: 15
+  .field
+    = f.label :isbn
+    br
+    = f.text_field :isbn, size: 25
+  .field
+    = f.label :isbn
+    br
+    = f.password_field :isbn, size: 25, maxlength: 15, disabled: true
+  .field
+    = f.label :isbn
+    br
+    = f.text_area :isbn, cols: 40, rows: 10
+  .field
+    label.pr-1
+      = f.radio_button :publish, '평론사', class: :rd
+      | 평론사
+    label.pr-1
+      = f.radio_button :publish, '지은사', class: :rd
+      | 지은사
+    label.pr-1
+      = f.radio_button :publish, '경제사', class: :rd
+      | 경제사
+  .field
+    = f.label :title
+    br
+    = f.text_field :title, size: 25
+  .field
+    = f.label :title
+    br
+    = f.text_field :title, size: 25
+  .field
+    = f.label :price
+    br
+    = f.number_field :price, size: 25
+  .field
+    = f.label :publish
+    br
+    = f.text_field :publish, size: 25
+  .field
+    = f.label :published
+    br
+    = f.date_field :published, size: 25
+  .field
+    = f.label :dl
+    br
+    label
+      = f.check_box :dl, { class: 'chk' }, 'yes', 'no'
+      | 다운로드 샘플 있는지?
+  .field
+    = f.file_field :isbn, size: 10, maxlength: 15
+    = f.hidden_field :isbn
+  .actions
+    = f.submit 'submit'

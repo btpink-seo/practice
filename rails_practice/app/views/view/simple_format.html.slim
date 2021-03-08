@@ -1,0 +1,11 @@
+ruby:
+  article = <<-EOL
+  Wings뉴스 특별호
+
+  안녕하십니까
+  Wing프로젝트의 야마다입니다div오늘은 추천서적의 특집을 보내드립니다.
+  <script>alert('Happy Rails!!');</script>
+  EOL
+
+= simple_format(article, { class: :article }, { sanitize: false})
+= simple_format(article, { class: :article }, { sanitize: true, wrapper_tag: 'blockquote'})

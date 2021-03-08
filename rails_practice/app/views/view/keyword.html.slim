@@ -1,0 +1,6 @@
+h1 = 'keyword'
+= form_tag({ controller: :keyword, action: :search }, id: :fm, class: :search) do
+  label for='weywd'
+    | Search keyword
+  = text_field_tag :keyword, '', size: 30
+  = submit_tag 'Search'

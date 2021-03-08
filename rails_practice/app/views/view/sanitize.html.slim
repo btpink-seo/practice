@@ -1,0 +1,11 @@
+ruby:
+  msg = <<-EOL
+  <p style="color:Red">Rails에 대하여<br/> 질문이 있습니다.</p>
+  <strong id="hoge" class="myclazz">긴급</strong>
+  <a href="JavaScript:alert('NG')">여기에 답변해주세요.</a>
+  <a href="http://www.wings.msn.to">서포트사이트</a>
+  EOL
+
+= sanitize msg
+hr
+= sanitize msg, tags: %w[p a], attributes: %w[id class href style]

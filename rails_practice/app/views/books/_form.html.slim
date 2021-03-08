@@ -1,0 +1,29 @@
+= form_for @book do |f|
+  - if @book.errors.any?
+    #error_explanation
+      h2 = "#{pluralize(@book.errors.count, "error")} prohibited this book from being saved:"
+      ul
+        - @book.errors.full_messages.each do |message|
+          li = message
+
+  .field.form-group
+    = f.label :isbn
+    = f.text_field :isbn, class: 'form-control'
+  .field.form-group
+    = f.label :title
+    = f.text_field :title, class: 'form-control'
+  .field.form-group
+    = f.label :price
+    = f.number_field :price, class: 'form-control'
+  .field.form-group
+    = f.label :publish
+    = f.text_field :publish, class: 'form-control'
+  .field.form-group
+    = f.label :published
+    .form-row
+      = f.date_select :published, {}, { class: 'form-control bootstrap-date mr-1'}
+  .field.form-group
+    = f.label :dl
+    = f.check_box :dl, class: 'd-block'
+  .actions
+    = f.submit 'submit', class: 'btn btn-primary'

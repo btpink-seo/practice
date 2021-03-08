@@ -1,0 +1,63 @@
+# == Schema Information
+#
+# Table name: authors_books
+#
+#  id         :bigint           not null, primary key
+#  created_at :datetime         not null
+#  updated_at :datetime         not null
+#  author_id  :bigint
+#  book_id    :bigint
+#
+# Indexes
+#
+#  index_authors_books_on_author_id  (author_id)
+#  index_authors_books_on_book_id    (book_id)
+#
+# Foreign Keys
+#
+#  fk_rails_...  (author_id => authors.id)
+#  fk_rails_...  (book_id => books.id)
+#
+modernjs:
+  book_id: 1
+  author_id: 1
+
+jsp:
+  book_id: 2
+  author_id: 1
+
+jsp_2:
+  book_id: 2
+  author_id: 2
+
+java:
+  book_id: 3
+  author_id: 2
+
+vcpp:
+  book_id: 4
+  author_id: 2
+
+android:
+  book_id: 5
+  author_id: 1
+
+php:
+  book_id: 6
+  author_id: 3
+
+swift:
+  book_id: 7
+  author_id: 3
+
+docker:
+  book_id: 8
+  author_id: 1
+
+angular:
+  book_id: 9
+  author_id: 1
+
+aspnet:
+  book_id: 10
+  author_id: 3
