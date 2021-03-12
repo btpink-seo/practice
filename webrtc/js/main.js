@@ -1,8 +1,5 @@
 'use strict';
 
-// var isChannelReady = false;
-// var isInitiator = false;
-// var isStarted = false;
 var localStream;
 // {
 //   socketId: {
@@ -10,7 +7,6 @@ var localStream;
 //     isInitiator: true,
 //     isStarted: true,
 //     isChannelReady: true,
-//     over: true,
 //   }
 // }
 var peers = {};
@@ -167,24 +163,7 @@ function createPeerConnection(socketId) {
   try {
     var pc = new RTCPeerConnection(null);
     // pc.onicecandidate = handleIceCandidate;
-    pc.onicecandidate = function(event) {
-      if (event.candidate) {
-        // event.candidate가 존재하면 원격 유저에게 candidate를 전달합니다.
-        sendMessageTo(socketId, {
-          type: 'candidate',
-          label: event.candidate.sdpMLineIndex,
-          id: event.candidate.sdpMid,
-          candidate: event.candidate.candidate
-        });
-      } else {
-        // 모든 ICE candidate가 원격 유저에게 전달된 조건에서 실행됩니다.
-        // candidate = null
-        peers[socketId].isInitiator = true;
-        // isStarted = false;
-        // isChannelReady = false;
-        console.log('End of candidates.', peers[socketId].isInitiator);
-      }
-    }
+    pc.onicecandidate = (event) => handleIceCandidate(event, socketId)
     pc.onaddstream = handleRemoteStreamAdded;
     pc.onremovestream = handleRemoteStreamRemoved;
     console.log('Created RTCPeerConnnection');
@@ -197,23 +176,20 @@ function createPeerConnection(socketId) {
   }
 }
 
-// function handleIceCandidate(event) {
-//   console.log('icecandidate event: ', event);
-//   if (event.candidate) {
-//     sendMessage({
-//       type: 'candidate',
-//       label: event.candidate.sdpMLineIndex,
-//       id: event.candidate.sdpMid,
-//       candidate: event.candidate.candidate
-//     });
-//   } else {
-//     isInitiator = true;
-//     // peers[socketId].isConnected = true
-//     // isStarted = false;
-//     // isChannelReady = false;
-//     console.log('End of candidates.', isInitiator);
-//   }
-// }
+function handleIceCandidate(event, socketId) {
+  console.log('icecandidate event: ', event);
+  if (event.candidate) {
+    sendMessageTo(socketId, {
+      type: 'candidate',
+      label: event.candidate.sdpMLineIndex,
+      id: event.candidate.sdpMid,
+      candidate: event.candidate.candidate
+    });
+  } else {
+    peers[socketId].isInitiator = true;
+    console.log('End of candidates.', peers[socketId].isInitiator);
+  }
+}
 
 function handleCreateOfferError(event) {
   console.log('createOffer() error: ', event);
