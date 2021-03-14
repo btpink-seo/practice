@@ -50,7 +50,7 @@ io.sockets.on('connection', function(socket) {
       log('Client ID ' + socket.id + ' joined room ' + room);
       io.sockets.in(room).emit('join', room, socket.id); // 나를 제외한 전원
       socket.join(room);
-      socket.emit('joined', room); // 나에게만
+      socket.emit('joined', room, socket.id); // 나에게만
       io.sockets.in(room).emit('ready');
     } else { // max two clients
       socket.emit('full', room);

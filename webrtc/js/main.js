@@ -17,6 +17,7 @@ var pcConfig = {
     'urls': 'stun:stun.l.google.com:19302'
   }]
 };
+var mySocketId;
 
 // Set up audio and video regardless of what devices are present.
 var sdpConstraints = {
@@ -37,9 +38,9 @@ if (room !== '') {
   console.log('Attempted to create or  join room', room);
 }
 
-socket.on('created', function(room) {
+socket.on('created', function(room, socketId) {
   console.log('Created room ' + room);
-  // isInitiator = true;
+  mySocketId = socketId;
 });
 
 socket.on('full', function(room) {
@@ -50,12 +51,11 @@ socket.on('join', function (room, socketId){
   console.log('Another peer made a request to join room ' + room);
   console.log('This peer is the initiator of room ' + room + '!');
   peers[socketId] = { pc: undefined, isStarted: false, isChannelReady: true, isInitiator: true }
-  // isChannelReady = true;
 });
 
-socket.on('joined', function(room) {
+socket.on('joined', function(room, socketId) {
   console.log('joined: ' + room);
-  // isChannelReady = true;
+  mySocketId = socketId;
 });
 
 socket.on('log', function(array) {
@@ -98,8 +98,8 @@ socket.on('message', function(socketId, message) {
       candidate: message.candidate
     });
     peers[socketId].pc.addIceCandidate(candidate);
-  } else if (message === 'bye' && peers[socketId].isStarted) {
-    handleRemoteHangup();
+  } else if (message.type === 'bye' && peers[socketId].isStarted) {
+    handleRemoteHangup(message.id);
   }
 });
 
@@ -122,9 +122,6 @@ function gotStream(stream) {
   localStream = stream;
   localVideo.srcObject = stream;
   sendMessage('got user media');
-  // if (isInitiator) {
-  //   maybeStart();
-  // }
 }
 
 var constraints = {
@@ -154,7 +151,7 @@ function maybeStart(socketId) {
 }
 
 window.onbeforeunload = function() {
-  // sendMessage('bye');
+  sendMessage({ type: 'bye', id: mySocketId });
 };
 
 /////////////////////////////////////////////////////////
@@ -164,7 +161,7 @@ function createPeerConnection(socketId) {
     var pc = new RTCPeerConnection(null);
     // pc.onicecandidate = handleIceCandidate;
     pc.onicecandidate = (event) => handleIceCandidate(event, socketId)
-    pc.onaddstream = handleRemoteStreamAdded;
+    pc.onaddstream = (event) => handleRemoteStreamAdded(event, socketId);
     pc.onremovestream = handleRemoteStreamRemoved;
     console.log('Created RTCPeerConnnection');
     peers[socketId].pc = pc;
@@ -248,13 +245,11 @@ function requestTurn(turnURL) {
   }
 }
 
-function handleRemoteStreamAdded(event) {
+function handleRemoteStreamAdded(event, socketId) {
   console.log('Remote stream added.');
   var element = document.getElementById('remote');
-  var time = new Date().getTime()
-  element.insertAdjacentHTML('beforeend', `<video id='remoteVideo-${time}' autoplay playsinline></video>`);;
-  var remoteVideo = document.querySelector(`#remoteVideo-${time}`);
-  // remoteStream = event.stream;
+  element.insertAdjacentHTML('beforeend', `<video id='remoteVideo-${socketId}' autoplay playsinline></video>`);;
+  var remoteVideo = document.querySelector(`#remoteVideo-${socketId}`);
   remoteVideo.srcObject = event.stream;
 }
 
@@ -262,22 +257,19 @@ function handleRemoteStreamRemoved(event) {
   console.log('Remote stream removed. Event: ', event);
 }
 
-function hangup() {
+function hangup(socketId) {
   console.log('Hanging up.');
-  stop();
+  stop(socketId);
   sendMessage('bye');
 }
 
-function handleRemoteHangup() {
+function handleRemoteHangup(socketId) {
   console.log('Session terminated.');
-  stop();
-  // isInitiator = false;
+  stop(socketId);
 }
 
-function stop() {
-  // isStarted = false;
-  // peers.forEach((pc) => {
-  //   pc.close();
-  //   pc = null;
-  // })
+function stop(socketId) {
+  peers[socketId].pc.close();
+  document.getElementById(`remoteVideo-${socketId}`).remove();
+  delete peers[socketId]
 }
