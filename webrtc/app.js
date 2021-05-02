@@ -21,6 +21,7 @@ io.sockets.on('connection', function(socket) {
   }
 
   socket.on('message', function(message) {
+    console.log('message')
     log('Client said: ', message);
     // for a real app, would be room-only (not broadcast)
     // sending to all clients except sender
@@ -35,6 +36,7 @@ io.sockets.on('connection', function(socket) {
   });
 
   socket.on('create or join', function(room) {
+    console.log('create or join')
     log('Received request to create or join room ' + room);
 
     var clientsInRoom = io.sockets.adapter.rooms[room];

@@ -10,7 +10,7 @@ var localStream;
 //   }
 // }
 var peers = {};
-var remoteStream;
+// var remoteStream;
 var turnReady;
 var pcConfig = {
   'iceServers': [{
@@ -141,7 +141,8 @@ function maybeStart(socketId) {
   if (!peers[socketId].isStarted && typeof localStream !== 'undefined' && peers[socketId].isChannelReady) {
     console.log('>>>>>> creating peer connection');
     var pc = createPeerConnection(socketId);
-    pc.addStream(localStream);
+    // pc.addStream(localStream);
+    localStream.getTracks().forEach(track => pc.addTrack(track, localStream));
     peers[socketId].isStarted = true;
     console.log('isInitiator', peers[socketId].isInitiator);
     if (peers[socketId].isInitiator) {
@@ -161,8 +162,11 @@ function createPeerConnection(socketId) {
     var pc = new RTCPeerConnection(null);
     // pc.onicecandidate = handleIceCandidate;
     pc.onicecandidate = (event) => handleIceCandidate(event, socketId)
-    pc.onaddstream = (event) => handleRemoteStreamAdded(event, socketId);
-    pc.onremovestream = handleRemoteStreamRemoved;
+    // pc.ontrack = (event) => handleRemoteStreamAdded(event, socketId);
+    // pc.onremovestream = handleRemoteStreamRemoved;
+
+    pc.addEventListener('addstream', (event) => handleRemoteStreamAdded(event, socketId));
+    pc.addEventListener('onremovestream', handleRemoteStreamRemoved);
     console.log('Created RTCPeerConnnection');
     peers[socketId].pc = pc;
     return pc;
