@@ -35,7 +35,7 @@ const no10 = (num) => {
   }
 };
 const no11 = (num) => Array.from(Array(num + 1).keys()).reduce((a, c) => a + c);
-const no11 = (num) => num * (num + 1) / 2;
+// const no11 = (num) => num * (num + 1) / 2;
 
 // 12
 class Wizard {
@@ -91,12 +91,74 @@ const no27 = (std_name, score) => {
   return result;
 }
 const no28 = (string) => Array.from({ length: string.length - 1 }, (_, i) => `${string[i]} ${string[i + 1]}`);
-const no29 = (string) => string === string.toUpperCase() ? 'YES' : 'NO';
+// const no29 = (string) => string === string.toUpperCase() ? 'YES' : 'NO';
 const no29 = (string) => string.charCodeAt() > 96 ? 'NO' : 'YES';
 const no30 = (string, search) => string.indexOf(search);
 
-console.log(no20(7, 2));
-console.log(no24('asdf'));
-console.log(no26('토성'));
-console.log(no27('a b', '80 90'));
-console.log(no28('Javascript'));
+// 31. 3, 5
+const no32 = (string) => string.split(' ').length;
+const no33 = (array) => array.reverse();
+const no34 = (heights) => heights.split(' ').every((e, i, arry) => {
+  if (i < arry.length - 1) {
+    return +e < +arry[i + 1]
+  } else {
+    return true
+  }
+});
+const no35 = (n) => {
+  return (times) => Math.pow(n, times);
+}
+// const a = no35(2);
+// console.log(a(10))
+
+const no36 = (n) => Array.from({ length: 9 }, (_, i) => (i + 1) * n);
+const no37 = (array) => {
+  const base = {};
+  let max = ['', 0];
+
+  array.forEach((a) => base[a] = base[a] ? base[a] + 1 : 1 );
+  Object.keys(base).forEach((key) => {
+    if (base[key] > max[1]) max = [key, base[key]];
+  });
+  return `${max[0]}(이)가 총 ${max[1]}표로 반장이 되었습니다.`;
+}
+const no38 = (scores) => {
+  const sortedScores = scores.split(' ').map((s) => +s).sort((a,b) => b - a);
+  const result = [];
+  let count = 0;
+  for (let i = 0; i < sortedScores.length; i++) {
+    if (result[result.length - 1] !== sortedScores[i]) {
+      if (count > 2) break;
+      count++;
+    }
+    result.push(sortedScores[i]);
+  }
+  return result.length;
+}
+const no39 = (string) => string.replace(/q/g, 'e');
+const no40 = (limit, array) => {
+  let total = 0;
+  let count = 0;
+  array.forEach((e) => {
+    if (total + e < limit) {
+      total += e;
+      count += 1;
+    }
+  })
+  return count;
+}
+
+console.log(no40(70, [20, 20, 20, 20, 20]))
+// console.log(no39('querty hqllo my namq is hyqwon'));
+// console.log(no38('97 86 75 66 55 97 85 97 97 95 86'))
+// console.log(no37(['원범', '원범', '혜원', '혜원', '혜원', '혜원', '유진', '유진']))
+// console.log(no36(3))
+
+
+// console.log(no34('1 2 3 4 5'))
+// console.log(no34('1 2 3 4 5 0'))
+// console.log(no20(7, 2));
+// console.log(no24('asdf'));
+// console.log(no26('토성'));
+// console.log(no27('a b', '80 90'));
+// console.log(no28('Javascript'));
