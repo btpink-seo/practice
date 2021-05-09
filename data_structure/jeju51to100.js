@@ -325,30 +325,188 @@ const no70 = (a, b) => {
 
   return result;
 };
-console.log(no70([[1, 2], [2, 4]], [[1, 2], [4, 3]]))
-console.log(no70([[1, 2], [2, 4]], [[1, 0], [0, 3]]))
+// console.log(no70([[1, 2], [2, 4]], [[1, 2], [4, 3]]))
+// console.log(no70([[1, 2], [2, 4]], [[1, 0], [0, 3]]))
 
 
-const no71 = () => {};
-// console.log(no71())
+const no71 = (graph, start) => {
+  const dfs = (data, key, call, result) => {
+    result.push(key);
+    const values = data[key];
+    if (values.length === 1) return;
 
-const no72 = () => {};
-// console.log(no72())
+    const child = values.filter((value) => value !== call);
 
-const no73 = () => {};
-// console.log(no73())
+    child.forEach((value) => dfs(data, value, key, result));
+  };
 
-const no74 = () => {};
-// console.log(no74())
+  const output = [start];
+  graph[start].forEach((value) => dfs(graph, value, start, output));
+  return output.join(' ');
+};
+// console.log(no71({
+//   'E': ['D', 'A'],
+//   'F': ['D'],
+//   'A': ['E', 'C', 'B'],
+//   'B': ['A'],
+//   'C': ['A'],
+//   'D': ['E', 'F'],
+// }, 'E'))
 
-const no75 = () => {};
-// console.log(no75())
+const no72 = (graph, start) => {
+  const bfs = (data, key, call, result) => {
+    const values = data[key];
+    if (values.length === 1) return;
 
-const no76 = () => {};
-// console.log(no76())
+    const child = values.filter((value) => value !== call);
 
-const no77 = () => {};
-// console.log(no77())
+    child.forEach((value) => {
+      result.push(value);
+      bfs(data, value, key, result)
+    });
+  };
+
+  const output = [start].concat(graph[start]);
+  graph[start].forEach((value) => bfs(graph, value, start, output));
+  return output.join(' ');
+};
+// console.log(no72({
+//   'E': ['D', 'A'],
+//   'F': ['D'],
+//   'A': ['E', 'C', 'B'],
+//   'B': ['A'],
+//   'C': ['A'],
+//   'D': ['E', 'F'],
+// }, 'E'))
+
+const no73 = (graph, start, end) => {
+  const search = (data, searchStart, targetEnd, call, result, cnt) => {
+    cnt++;
+    if (data[searchStart].includes(targetEnd)) return result.push(cnt);
+    const child = data[searchStart].filter((value) => value !== call);
+    child.forEach((value) => search(data, value, targetEnd, searchStart, result, cnt));
+  };
+
+  const result = [];
+  const basic = graph[start];
+  if (basic.includes(end)) return 1;
+
+  basic.forEach((value) => search(graph, value, end, start, result, 1));
+  return Math.min(...result);
+};
+// console.log(no73({
+//   'A': ['B', 'C'],
+//   'B': ['A', 'D', 'E'],
+//   'C': ['A', 'F'],
+//   'D': ['B'],
+//   'E': ['B', 'F'],
+//   'F': ['C', 'E'],
+// }, 'D', 'C'))
+
+const no74 = (graph, start, end) => {
+  const result = [];
+  const search = (target, used, cnt) => {
+    cnt++;
+    used.push(target);
+    if (graph[target].includes(end)) {
+      console.log(cnt, target, graph[target])
+      result.push(cnt);
+    }
+
+    const child = graph[target].filter((value) => !used.includes(value));
+    child.forEach((value) => {
+      if (value !== end) {
+        search(value, used, cnt)
+      }
+    });
+  };
+
+  graph[start].forEach((value) => search(value, [start], 1));
+  return Math.max(...result);
+};
+// console.log(no74({
+//   1: [2, 3, 4],
+//   2: [1, 3, 4, 5, 6],
+//   3: [1, 2, 7],
+//   4: [1, 2, 5, 6],
+//   5: [2, 4, 6, 7],
+//   6: [2, 4, 5, 7],
+//   7: [3, 5, 6],
+// }, 1, 7))
+
+const no75 = (num) => {
+  let count = 0;
+  for (let i = 1; i <= num; i++) {
+    if (!/([^369])/.test(String(i))) {
+      // console.log(i)
+      count++;
+    }
+  }
+  return count;
+};
+// console.log(no75(93))
+
+const no76 = (size, searchSize, map) => {
+  const count = [];
+  const search = (x, y) => {
+    let temp = 0;
+    for (let i = 0; i < searchSize; i++) {
+      for (let j = 0; j < searchSize; j++) {
+        if (map[x + i][y + j]) temp++;
+      }
+    }
+    count.push(temp);
+  }
+
+  for (let i = 0; i + searchSize <= size; i++) {
+    for (let j = 0; j + searchSize <= size; j++) {
+      search(i, j);
+    }
+  }
+  return Math.max(...count);
+};
+// console.log(no76(5, 3, [
+//   [1, 0, 0, 1, 0],
+//   [0, 1, 0, 0, 1],
+//   [0, 0, 0, 1, 0],
+//   [0, 0, 0, 0, 0],
+//   [0, 0, 1, 0, 0]
+// ]))
+
+const no77 = (stringA, stringB) => {
+  // const basic = stringA.length > stringB.length ? stringB.split('') : stringA.split('');
+
+  let basic, target;
+  if (stringA.length > stringB.length) {
+    basic = stringB.split('');
+    target = stringA;
+  } else {
+    basic = stringA.split('');
+    target = stringB;
+  }
+
+  const result = [];
+  // console.log(basic, target)
+  for (let i = basic.length; i > 0; i--) {
+    for (let j = 0; j + i <= basic.length; j++) {
+      const search = basic.slice(j, j + i).join('');
+
+      console.log(i, basic.join(''), target, search, target.indexOf(search) > -1)
+
+      if (target.indexOf(search) > -1) {
+        console.log('match!!', search)
+        // return i;
+        result.push(search)
+      }
+    }
+  }
+  console.log(result)
+  return 0;
+};
+console.log(no77('THISISSTRINGS', 'THISIS')) // 6
+// console.log(no77('THISISSTRINGS', 'TATHISISKKQQAEW')) // 6
+// console.log(no77('THISISSTRINGS', 'KIOTHIKESSISKKQQAEW')) // 6
+// console.log(no77('THISISSTRINGS', 'TKHKIKSIS')) // 3
 
 const no78 = () => {};
 // console.log(no78())
