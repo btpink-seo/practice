@@ -15,7 +15,7 @@ var superpalindromesInRange = function(left, right) {
     let result = ['0', '1'];
     for (let i = 0; i < num - 1; i++) {
       const tmp = [];
-      ['0', '1'].forEach((n) => result.forEach((n2) => tmp.push(n + n2)))
+      ['0', '1'].forEach((n) => result.forEach((n2) => tmp.push(n + n2)));
       result = tmp.slice();
     }
     return result;
@@ -32,13 +32,13 @@ var superpalindromesInRange = function(left, right) {
     });
   }
   const twoGenerator = (zeroLength, array, index = '') => {
-    const zero = Array.from({ length: zeroLength }, (_) => 0).join('')
+    const zero = Array.from({ length: zeroLength }, (_) => 0).join('');
     check(2, zero, zero, array, index);
   }
 
   // 시작 자리수, 종료 자리수 로 반복문 시작
   // 홀수 자리수 인 경우만 계산
-  const odd = Array.from({ length: 10 }, (_, i) => 2*i + 1)
+  const odd = Array.from({ length: 10 }, (_, i) => 2*i + 1);
   const result = [1, 4, 9];
   const min = left.length < 2 ? 2 : left.length;
   for (let i = min; i <= right.length; i++) {
@@ -51,7 +51,7 @@ var superpalindromesInRange = function(left, right) {
     const zeroLength = half - 1;
 
     if (rootValueLength % 2 === 0) {
-      oneGenerator(zeroLength, result)
+      oneGenerator(zeroLength, result);
       twoGenerator(zeroLength, result);
     } else {
       for (let j = 0; j < 3; j++) {

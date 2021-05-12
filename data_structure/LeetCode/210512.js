@@ -15,11 +15,11 @@ var NumMatrix = function(matrix) {
  * @return {number}
  */
 NumMatrix.prototype.sumRegion = function(row1, col1, row2, col2) {
-  let sum = Array.from({ length: row2 - row1 + 1 }, (_, i) => row1 + i).reduce((r, c) => r + this.cache[c], 0)
+  let sum = 0;
   for (let i = row1; i <= row2; i++) {
+    sum += this.cache[i];
     for (let j = 0; j < this.matrix[i].length; j++) {
-      const element = this.matrix[i][j];
-      if (j < col1 || j > col2) sum -= element;
+      if (j < col1 || j > col2) sum -= this.matrix[i][j];
     }
   }
   return sum;
