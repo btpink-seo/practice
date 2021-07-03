@@ -503,7 +503,7 @@ const no77 = (stringA, stringB) => {
   console.log(result)
   return 0;
 };
-console.log(no77('THISISSTRINGS', 'THISIS')) // 6
+// console.log(no77('THISISSTRINGS', 'THISIS')) // 6
 // console.log(no77('THISISSTRINGS', 'TATHISISKKQQAEW')) // 6
 // console.log(no77('THISISSTRINGS', 'KIOTHIKESSISKKQQAEW')) // 6
 // console.log(no77('THISISSTRINGS', 'TKHKIKSIS')) // 3
