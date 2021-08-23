@@ -1,17 +1,18 @@
 import java.util.*;
+import java.lang.System.out.println;
 
 public class Chapter2 {
-    public void exec() {
+    public static void exec() {
         Scanner scanner = new Scanner(System.in);
-        System.out.println("Welcome uranai");
-        System.out.println("Insert your name");
+        println("Welcome uranai");
+        println("Insert your name");
         String name = scanner.nextLine();
-        System.out.println("Insert your age");
+        println("Insert your age");
         String ageString = scanner.nextLine();
         int fortune = new Random().nextInt(4);
         fortune++;
 
-        System.out.println("result : " + ageString + "_" + name + "_" + fortune);
+        println("result : " + ageString + "_" + name + "_" + fortune);
         scanner.close();
     }
 }
